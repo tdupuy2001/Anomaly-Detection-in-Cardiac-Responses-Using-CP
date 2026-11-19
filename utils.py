@@ -48,6 +48,7 @@ import ast
 import pickle 
 import os
 
+#TODO add .pkl to save the instance of the trained models for CP (to avoid retrain when testing)
 #TODO mettre features selection au max ou l'enlever dans la grid et la distrib (possibilité de mettre mais pas nécessaire)
 class trainingHR:
     def __init__(self,path_data):
@@ -1015,7 +1016,7 @@ class resultsAnalysis:
         summary = self.results.groupby("Regressor")[self.metrics].agg(["mean", "std"])
         print(summary)
     
-    def plot_bins(self,metric,nb_bins,colors):
+    def plot_bins(self,metric,nb_bins,colors,name_fig):
         self.results["obs_bin"] = pd.qcut(self.results["Number of observations"],q=nb_bins,duplicates="drop",precision=0)
         binned = self.results.groupby(["Regressor", "obs_bin"])[metric].mean().reset_index()
         bins = binned["obs_bin"].astype(str).unique()
@@ -1030,8 +1031,10 @@ class resultsAnalysis:
         plt.ylabel(metric)
         plt.xticks([x_i+bar_width*(len(regressors)-1)/2 for x_i in x],bins,rotation=30)
         plt.legend(bbox_to_anchor=(1, 1), loc="upper left")
+        plt.savefig(name_fig, dpi=300, bbox_inches="tight")
         plt.tight_layout()
         plt.show()
+        
 
 class CPAnalysis:
     def __init__(self,path_result):
